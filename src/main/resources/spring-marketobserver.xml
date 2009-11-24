@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+	
+	<context:annotation-config/>
+		
+	<bean id="adrianMassey" class="dk.bot.adrianmassey.AdrianMasseyImpl"/>
+	<bean id="racingPost" class="dk.bot.racingpost.RacingPostImpl"/>
+	
+	<bean id="runnerService" class="dk.bot.marketobserver.runnerservice.RunnerServiceImpl">
+		<constructor-arg ref="betFairService"/>
+		<constructor-arg ref="completeMarketsCache"/>
+	</bean>
+	
+	<bean id="marketService" class="dk.bot.marketobserver.marketservice.MarketServiceImpl">
+		<property name="matchedBwinCache" ref="matchedBwinCache" />
+		<property name="matchedRacingPostCache" ref="matchedRacingPostCache" />
+		<property name="matchedAdrianMasseyCache" ref="matchedAdrianMasseyCache" />
+	</bean>
+	
+	<bean id="completeMarketsCache" class="dk.bot.marketobserver.cache.completemarkets.CompleteMarketsCacheImpl"/>
+	
+	<bean id="bfMarketCache" class="dk.bot.marketobserver.cache.bfmarket.BFMarketCache">
+		<constructor-arg value="BFMarkets"/>
+	<!-- 10 min expiry time -->
+		<constructor-arg value="600"/>
+	</bean>
+	<bean id="bwinCache" class="dk.bot.marketobserver.cache.bwin.BwinCache">
+		<constructor-arg value="BwinCache"/>
+		<!-- 10 min expiry time -->
+		<constructor-arg value="600"/>
+	</bean>
+	<bean id="matchedBwinCache" class="dk.bot.marketobserver.cache.bwin.matchedbwin.MatchedBwinCache">
+		<constructor-arg value="BwinCacheMatched"/>
+		<!-- 10 min expiry time -->
+		<constructor-arg value="600"/>
+	</bean>
+	
+	<bean id="racingPostCache" class="dk.bot.marketobserver.cache.racingpost.RacingPostCache">
+		<constructor-arg value="RacingPost"/>
+		<!-- never expires -->
+		<constructor-arg value="0"/>
+	</bean>
+	<bean id="matchedRacingPostCache" class="dk.bot.marketobserver.cache.racingpost.matchedracingpost.MatchedRacingPostCache">
+		<constructor-arg value="RacingPostMatched"/>
+		<!-- never expires -->
+		<constructor-arg value="0"/>
+	</bean>
+	
+	<bean id="adrianMasseyCache" class="dk.bot.marketobserver.cache.adrianmassey.AdrianMasseyCache">
+		<constructor-arg value="AdrianMassey"/>
+		<!-- never expires -->
+		<constructor-arg value="0"/>
+	</bean>
+	<bean id="matchedAdrianMasseyCache" class="dk.bot.marketobserver.cache.adrianmassey.matchedadrianmassey.MatchedAdrianMasseyCache">
+		<constructor-arg value="AdrianMasseyMatched"/>
+		<!-- never expires -->
+		<constructor-arg value="0"/>
+	</bean>
+	
+	<!-- DAO objects -->
+	<bean id="marketDetailsDao" class="dk.bot.marketobserver.dao.postgres.PostgresMarketDetailsDAO">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	
+	<bean id="marketObserverMBean" class="dk.bot.marketobserver.mbean.MarketObserverMBeanImpl"/>
+	<context:mbean-export/>
+</beans>

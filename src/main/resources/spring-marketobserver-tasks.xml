@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+			
+	<!-- Scheduled tasks -->
+	
+	<!--  RunnerService timer task -->
+	<bean id="runnerServiceTask" class="dk.bot.marketobserver.tasks.analyzerunners.RunnerServiceTaskImpl">
+		<constructor-arg value="RunnerTask"/>
+		<constructor-arg ref="runnerService"/>
+		<constructor-arg ref="marketService"/>
+		<constructor-arg ref="bfMarketCache"/>
+		<constructor-arg ref="completeMarketsCache"/>
+	</bean>
+	
+	<bean id="runnerServiceJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+  		<property name="targetObject" ref="runnerServiceTask" />
+  		<property name="targetMethod" value="execute" />
+  		<property name="concurrent" value="false" />
+	</bean>
+	
+	<bean id="runnerServiceTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerBean">
+    	<property name="jobDetail" ref="runnerServiceJob" />
+    	<!-- 1 seconds -->
+    	<property name="startDelay" value="1000" />
+    	<!-- repeat every 100ms -->
+    	<property name="repeatInterval" value="100" />
+	</bean>
+	
+	<!--  RunnerService timer task for HR markets 10 mins before market start. -->
+	<bean id="hr10MinBeforeRunnerServiceTask" class="dk.bot.marketobserver.tasks.analyzerunners.HR10MinBeforeRunnerServiceTaskImpl">
+		<constructor-arg value="HR10MinBeforeRunnerTask"/>
+		<constructor-arg ref="runnerService"/>
+		<constructor-arg ref="marketService"/>
+		<constructor-arg ref="bfMarketCache"/>
+		<constructor-arg ref="completeMarketsCache"/>
+	</bean>
+	
+	<bean id="hr10MinBeforeRnnerServiceJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+  		<property name="targetObject" ref="hr10MinBeforeRunnerServiceTask" />
+  		<property name="targetMethod" value="execute" />
+  		<property name="concurrent" value="false" />
+	</bean>
+	
+	<bean id="hr10MinBeforeRunnerServiceTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerBean">
+    	<property name="jobDetail" ref="hr10MinBeforeRnnerServiceJob" />
+    	<!-- 1 seconds -->
+    	<property name="startDelay" value="1000" />
+    	<!-- repeat every 5s -->
+    	<property name="repeatInterval" value="5000" />
+	</bean>
+	
+	<!--  Refresh Betfair markets Cache -->
+	<bean id="refreshBFMarketCacheTask" class="dk.bot.marketobserver.tasks.bfmarket.RefreshBFMarketsImpl">
+		<constructor-arg value="RefreshBFMarketCache"/>
+		<constructor-arg ref="betFairService"/>
+		<constructor-arg ref="marketDetailsDao"/>
+		<constructor-arg ref="bfMarketCache"/>
+	</bean>
+	
+	<bean id="refreshBFMarketCacheJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+  		<property name="targetObject" ref="refreshBFMarketCacheTask" />
+  		<property name="targetMethod" value="execute" />
+  		<property name="concurrent" value="false" />
+	</bean>
+	
+	<bean id="refreshBFMarketCacheTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerBean">
+    	<property name="jobDetail" ref="refreshBFMarketCacheJob" />
+    	<!-- 1 seconds -->
+    	<property name="startDelay" value="10000" />
+    	<!-- repeat every 5 mins -->
+    	<property name="repeatInterval" value="300000" />
+	</bean>
+	
+	<!--  Refresh Bwin Cache -->
+	<bean id="refreshBwinCacheTask" class="dk.bot.marketobserver.tasks.bwin.RefreshBwinCache">
+		<constructor-arg value="RefreshBwinCache"/>
+		<constructor-arg ref="bwinService"/>
+		<constructor-arg ref="bfMarketCache"/>
+		<constructor-arg ref="bwinCache"/>
+		<constructor-arg ref="matchedBwinCache"/>
+	</bean>
+	
+	<bean id="refreshBwinCacheJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+  		<property name="targetObject" ref="refreshBwinCacheTask" />
+  		<property name="targetMethod" value="execute" />
+  		<property name="concurrent" value="false" />
+	</bean>
+	
+	<bean id="refreshBwinCacheTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerBean">
+    	<property name="jobDetail" ref="refreshBwinCacheJob" />
+    	<!-- 1 seconds -->
+    	<property name="startDelay" value="1000" />
+    	<!-- repeat every 5 mins -->
+    	<property name="repeatInterval" value="300000" />
+	</bean>
+	
+		<!--  Refresh RacingPost Cache -->
+	<bean id="refreshRacingpostCacheTask" class="dk.bot.marketobserver.tasks.racingpost.RefreshRacingpostCache">
+		<constructor-arg value="RefreshRacingpostCache"/>
+		<constructor-arg ref="racingPost"/>
+		<constructor-arg ref="bfMarketCache"/>
+		<constructor-arg ref="racingPostCache"/>
+		<constructor-arg ref="matchedRacingPostCache"/>
+	</bean>
+	
+	<bean id="refreshRacingpostCacheJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+  		<property name="targetObject" ref="refreshRacingpostCacheTask" />
+  		<property name="targetMethod" value="execute" />
+  		<property name="concurrent" value="false" />
+	</bean>
+	
+	<bean id="refreshRacingpostCacheTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerBean">
+    	<property name="jobDetail" ref="refreshRacingpostCacheJob" />
+    	<!-- 1 seconds -->
+    	<property name="startDelay" value="1000" />
+    	<!-- repeat every 15 mins -->
+    	<property name="repeatInterval" value="900000" />
+	</bean>
+	
+		<!--  Refresh AdrianMassey Cache -->
+	<bean id="refreshAdrianMasseyCacheTask" class="dk.bot.marketobserver.tasks.adrianmassey.RefreshAdrianMasseyCache">
+		<constructor-arg value="RefreshAdrianMasseyCache"/>
+		<constructor-arg ref="adrianMassey"/>
+		<constructor-arg ref="bfMarketCache"/>
+		<constructor-arg ref="adrianMasseyCache"/>
+		<constructor-arg ref="matchedAdrianMasseyCache"/>
+	</bean>
+	
+	<bean id="refreshAdrianMasseyCacheJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+  		<property name="targetObject" ref="refreshAdrianMasseyCacheTask" />
+  		<property name="targetMethod" value="execute" />
+  		<property name="concurrent" value="false" />
+	</bean>
+	
+	<bean id="refreshAdrianMasseyCacheTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerBean">
+    	<property name="jobDetail" ref="refreshAdrianMasseyCacheJob" />
+    	<!-- 1 seconds -->
+    	<property name="startDelay" value="1000" />
+    	<!-- repeat every 15 mins -->
+    	<property name="repeatInterval" value="900000" />
+	</bean>
+	
+	<!--  Quartz Factory -->
+	<bean id="marketObserverScheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+    	<property name="triggers">
+      	  	<list>
+      	  	  <ref bean="refreshBFMarketCacheTrigger"/>  
+      	      <ref bean="runnerServiceTrigger" />   
+      	      <ref bean="hr10MinBeforeRunnerServiceTrigger" />
+      	      <ref bean="refreshBwinCacheTrigger"/>
+      	      <ref bean="refreshRacingpostCacheTrigger"/>
+      	      <ref bean="refreshAdrianMasseyCacheTrigger"/>
+        	</list>
+    	</property>
+    	<property name="schedulerName" value="marketObserverScheduler"/>
+    	<property name="autoStartup" value="false"/>
+	</bean>
+	
+</beans>
