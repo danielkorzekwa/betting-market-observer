@@ -231,4 +231,15 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
+
+	<repositories>
+		<repository>
+			<id>dk-maven2-repo-snapshots</id>
+			<name>dk-maven2 maven repository (snapshots)</name>
+			<url>
+				http://dk-maven2-repo.googlecode.com/svn/maven-repo/snapshots
+			</url>
+		</repository>
+	</repositories>
+
 </project>
