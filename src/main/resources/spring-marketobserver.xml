@@ -26,8 +26,8 @@
 	
 	<bean id="bfMarketCache" class="dk.bot.marketobserver.cache.bfmarket.BFMarketCache">
 		<constructor-arg value="BFMarkets"/>
-	<!-- 10 min expiry time -->
-		<constructor-arg value="600"/>
+	<!-- 100 min expiry time -->
+		<constructor-arg value="6000"/>
 	</bean>
 	<bean id="bwinCache" class="dk.bot.marketobserver.cache.bwin.BwinCache">
 		<constructor-arg value="BwinCache"/>
